@@ -65,8 +65,7 @@ class _OtpPageState extends State<OtpPage> {
           Card(
             margin: EdgeInsets.only(left: 20, right: 20),
             elevation: 6.0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(3.0),
@@ -80,13 +79,13 @@ class _OtpPageState extends State<OtpPage> {
                           textInputType: TextInputType.number,
                           length: 4,
                           obsecureText: false,
-                          inactiveColor: Colors.black,
+                          // inactiveColor: Colors.black,
                           animationType: AnimationType.fade,
-                          shape: PinCodeFieldShape.underline,
+                          // shape: PinCodeFieldShape.underline,
                           animationDuration: Duration(milliseconds: 300),
-                          borderRadius: BorderRadius.circular(5),
-                          fieldHeight: 30,
-                          fieldWidth: 25,
+                          // borderRadius: BorderRadius.circular(5),
+                          // fieldHeight: 30,
+                          // fieldWidth: 25,
                           autoFocus: true,
                           onChanged: (value) {
                             setState(() {
@@ -98,8 +97,7 @@ class _OtpPageState extends State<OtpPage> {
                         flex: 1,
                         child: MaterialButton(
                           onPressed: () {
-                            Navigator.of(context)
-                                .pushReplacementNamed(BookTaxiPage.routeName);
+                            Navigator.of(context).pushReplacementNamed(BookTaxiPage.routeName);
                           },
                           color: Colors.green,
                           textColor: Colors.white,

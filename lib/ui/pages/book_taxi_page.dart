@@ -9,11 +9,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:green_taxi/model/card_model.dart';
 import 'package:green_taxi/model/place_model.dart';
 import 'package:green_taxi/model/ride_option_model.dart';
+import 'package:green_taxi/provider/google_map_service.dart';
 import 'package:green_taxi/ui/widgets/drawer_widget.dart';
 import 'package:green_taxi/utils/constants.dart';
 import 'package:green_taxi/utils/styles.dart';
-
-import 'package:green_taxi/provider/google_map_service.dart';
 import 'package:uuid/uuid.dart';
 
 import 'taxi_movement_page.dart';
@@ -51,18 +50,9 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
   LatLngBounds bound;
 
   List<UserCardModel> _cards = [
-    UserCardModel(
-        id: "1",
-        imageUrl: 'assets/images/img_visa_logo.png',
-        cardNumber: "**** **** **** 5687"),
-    UserCardModel(
-        id: "2",
-        imageUrl: 'assets/images/img_visa_logo.png',
-        cardNumber: "**** **** **** 9987"),
-    UserCardModel(
-        id: "3",
-        imageUrl: 'assets/images/img_visa_logo.png',
-        cardNumber: "**** **** **** 7879")
+    UserCardModel(id: "1", imageUrl: 'assets/images/img_visa_logo.png', cardNumber: "**** **** **** 5687"),
+    UserCardModel(id: "2", imageUrl: 'assets/images/img_visa_logo.png', cardNumber: "**** **** **** 9987"),
+    UserCardModel(id: "3", imageUrl: 'assets/images/img_visa_logo.png', cardNumber: "**** **** **** 7879")
   ];
 
   List<RideOptionModel> ridesOptions = [
@@ -97,20 +87,17 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
 
   @override
   void initState() {
-    BitmapDescriptor.fromAssetImage(
-            ImageConfiguration(devicePixelRatio: 2.5), 'assets/images/taxi.png')
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/images/taxi.png')
         .then((onValue) {
       _taxilocation = onValue;
     });
 
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5),
-            'assets/images/mylocation.png')
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/images/mylocation.png')
         .then((onValue) {
       _mylocation = onValue;
     });
 
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5),
-            'assets/images/mydestination.png')
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/images/mydestination.png')
         .then((onValue) {
       _mydestination = onValue;
     });
@@ -148,37 +135,29 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
     polylineCoordinates.clear();
     _polylines.clear();
     List<PointLatLng> result = await polylinePoints?.getRouteBetweenCoordinates(
-        Constatnts.API_KEY,
-        _fromPlaceDetail.lat,
-        _fromPlaceDetail.lng,
-        _toPlaceDetail.lat,
-        _toPlaceDetail.lng);
+        Constatnts.API_KEY, _fromPlaceDetail.lat, _fromPlaceDetail.lng, _toPlaceDetail.lat, _toPlaceDetail.lng);
     if (result.isNotEmpty) {
       result.forEach((PointLatLng point) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       });
     }
     setState(() {
-      Polyline polyline = Polyline(
-          polylineId: PolylineId('poly'),
-          color: Colors.black,
-          width: 4,
-          points: polylineCoordinates);
+      Polyline polyline =
+          Polyline(polylineId: PolylineId('poly'), color: Colors.black, width: 4, points: polylineCoordinates);
       _polylines.add(polyline);
       _hasGottenCordinates = true;
     });
   }
 
-  void _moveCamera(
-      PlaceDetail _fromplaceDetail, PlaceDetail _toPlaceDetail) async {
+  void _moveCamera(PlaceDetail _fromplaceDetail, PlaceDetail _toPlaceDetail) async {
     if (_markers.length > 0) {
       setState(() {
         _markers.clear();
       });
     }
-    if (_toLocationController.text != null && _toPlaceDetail != null) {
-      getLatLngBounds(LatLng(_fromplaceDetail.lat, _fromplaceDetail.lng),
-          LatLng(_toPlaceDetail.lat, _toPlaceDetail.lng));
+    if (_toLocationController.text != null && _toPlaceDetail != null && _fromplaceDetail != null) {
+      getLatLngBounds(
+          LatLng(_fromplaceDetail.lat, _fromplaceDetail.lng), LatLng(_toPlaceDetail.lat, _toPlaceDetail.lng));
       GoogleMapController controller = await _controller.future;
       CameraUpdate u2 = CameraUpdate.newLatLngBounds(bound, 50);
       controller.animateCamera(u2).then((void v) {
@@ -231,13 +210,11 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
     if (from.latitude > to.latitude && from.longitude > to.longitude) {
       bound = LatLngBounds(southwest: to, northeast: from);
     } else if (from.longitude > to.longitude) {
-      bound = LatLngBounds(
-          southwest: LatLng(from.latitude, to.longitude),
-          northeast: LatLng(to.latitude, from.longitude));
+      bound =
+          LatLngBounds(southwest: LatLng(from.latitude, to.longitude), northeast: LatLng(to.latitude, from.longitude));
     } else if (from.latitude > to.latitude) {
-      bound = LatLngBounds(
-          southwest: LatLng(to.latitude, from.longitude),
-          northeast: LatLng(from.latitude, to.longitude));
+      bound =
+          LatLngBounds(southwest: LatLng(to.latitude, from.longitude), northeast: LatLng(from.latitude, to.longitude));
     } else {
       bound = LatLngBounds(southwest: from, northeast: to);
     }
@@ -249,8 +226,7 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
     LatLngBounds l2 = await c.getVisibleRegion();
     print(l1.toString());
     print(l2.toString());
-    if (l1.southwest.latitude == -90 || l2.southwest.latitude == -90)
-      check(u, c);
+    if (l1.southwest.latitude == -90 || l2.southwest.latitude == -90) check(u, c);
   }
 
   void _clearCordinate() {
@@ -288,17 +264,14 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
                       zoomGesturesEnabled: true,
                       markers: _markers,
                       polylines: _polylines,
-                      initialCameraPosition:
-                          CameraPosition(target: myLocation, zoom: 15),
+                      initialCameraPosition: CameraPosition(target: myLocation, zoom: 15),
                       onMapCreated: (GoogleMapController controller) {
                         controller.setMapStyle(_mapStyle);
                         _controller.complete(controller);
                       },
                     )),
           Positioned(top: 65, left: 5, right: 5, child: _buildHelloWidget()),
-          _hasGottenCordinates
-              ? _buildSelectRideWidget()
-              : _buildToFromDestination(),
+          _hasGottenCordinates ? _buildSelectRideWidget() : _buildToFromDestination(),
           Positioned(
             top: 25.0,
             left: 5.0,
@@ -376,8 +349,7 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
                     if (sessionToken == null) {
                       sessionToken = uuid.v4();
                     }
-                    googleMapServices =
-                        GoogleMapServices(sessionToken: sessionToken);
+                    googleMapServices = GoogleMapServices(sessionToken: sessionToken);
                     return await googleMapServices.getSuggestions(pattern);
                   },
                   itemBuilder: (context, suggetion) {
@@ -426,8 +398,7 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
                     if (sessionToken == null) {
                       sessionToken = uuid.v4();
                     }
-                    googleMapServices =
-                        GoogleMapServices(sessionToken: sessionToken);
+                    googleMapServices = GoogleMapServices(sessionToken: sessionToken);
                     return await googleMapServices.getSuggestions(pattern);
                   },
                   itemBuilder: (context, suggetion) {
@@ -514,9 +485,7 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
                         child: Card(
                           margin: const EdgeInsets.all(15.0),
                           elevation: 10,
-                          color: _selectedIndex == ridesOptions[index].index
-                              ? Constatnts.primaryColor
-                              : Colors.white,
+                          color: _selectedIndex == ridesOptions[index].index ? Constatnts.primaryColor : Colors.white,
                           child: Container(
                             child: Container(
                               width: 200,
@@ -525,40 +494,30 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
                                 child: Row(
                                   children: <Widget>[
                                     Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
                                           ridesOptions[index].rideType,
-                                          style: _selectedIndex ==
-                                                  ridesOptions[index].index
+                                          style: _selectedIndex == ridesOptions[index].index
                                               ? CustomStyles.cardBoldTextStyle
-                                              : CustomStyles
-                                                  .cardBoldDarkTextStyle,
+                                              : CustomStyles.cardBoldDarkTextStyle,
                                         ),
                                         Text(
                                           "N ${ridesOptions[index].price.toString()}",
-                                          style: _selectedIndex ==
-                                                  ridesOptions[index].index
+                                          style: _selectedIndex == ridesOptions[index].index
                                               ? CustomStyles.cardNormalTextStyle
-                                              : CustomStyles
-                                                  .cardNormalDarkTextStyle,
+                                              : CustomStyles.cardNormalDarkTextStyle,
                                         ),
                                         Text(
                                           ridesOptions[index].estimatedTime,
-                                          style: _selectedIndex ==
-                                                  ridesOptions[index].index
+                                          style: _selectedIndex == ridesOptions[index].index
                                               ? CustomStyles.cardNormalTextStyle
-                                              : CustomStyles
-                                                  .cardNormalDarkTextStyle,
+                                              : CustomStyles.cardNormalDarkTextStyle,
                                         )
                                       ],
                                     ),
-                                    Expanded(
-                                        child: Image.asset(
-                                            ridesOptions[index].imageUrl))
+                                    Expanded(child: Image.asset(ridesOptions[index].imageUrl))
                                   ],
                                 ),
                               ),
@@ -618,8 +577,7 @@ class _BookTaxiPageState extends State<BookTaxiPage> {
                     ),
                     color: Constatnts.primaryColor,
                     onPressed: () {
-                      Navigator.of(context)
-                          .push(new MaterialPageRoute(builder: (context) {
+                      Navigator.of(context).push(new MaterialPageRoute(builder: (context) {
                         return TaxiMovementPage(
                           fromPlaceDetail: _fromPlaceDetail,
                           toPlaceDetail: _toPlaceDetail,
